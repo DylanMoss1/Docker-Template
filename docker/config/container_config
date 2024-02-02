@@ -1,0 +1,51 @@
+#!/bin/bash 
+
+# Include private details (such as passwords)
+source ./config/.env
+
+# ----------------------------------- #
+# --- BEGIN CONFIGURATION SECTION --- #
+# ----------------------------------- #
+
+# Set username and password inside the container
+# IMPORTANT: change default password in .env 
+name="dylan"
+password="$password"
+
+# Set to either "docker" or "podman" (if unsure, use "docker")
+container_manager="podman"
+
+# Name of the container (set to any meaningful project name)
+container_name="container_name"
+
+# Name of the terminal, purely cosmetic (i.e. terminal looks like name@terminal-name:/)
+terminal_name="terminal-name"
+
+# Git credentials 
+github_username="DylanMoss1"
+github_email="dylan.moss2001@gmail.com"
+
+# Custom docker/podman run commands
+custom_args=""
+
+# --------------------------------- #
+# --- END CONFIGURATION SECTION --- #
+# --------------------------------- #
+
+# Path to _host_ folder to mount file from 
+mount_onto=$(dirname "$(pwd)")
+
+# Path to _container_ folder to mount files onto 
+work_directory=/home/$name/"$(basename "$mount_onto")"
+
+# Add private SSH key to container  
+if [ "$(uname -o 2>/dev/null)" = "Cygwin" ]; then
+    # Assume host machine is Windows
+    private_ssh_key_location="/c/Users/your_username/.ssh/id_rsa"
+elif grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
+    # Assume host machine is WSL
+    private_ssh_key_location="/mnt/c/Users/your_username/.ssh/id_rsa"
+else
+    # Assume host machine is Linux or MacOS
+    private_ssh_key_location="~/.ssh/id_rsa"
+fi

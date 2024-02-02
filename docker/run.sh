@@ -1,7 +1,9 @@
 #!/bin/bash
 
-source ./config/docker_config
+# Import config from container_config
+source ./config/container_config
 
+# If using podman: add extra id and mounting rules (to account for not being a privilaged user)
 if [ "$container_manager" = "podman" ]; then
     podman_extra_args="--userns=keep-id \
                        -v /dev/:/dev:rslave --mount type=devpts,destination=/dev/pts"
@@ -22,9 +24,10 @@ else
         --device=/dev/dri:/dev/dri \
         --user "$(id -u):$(id -g)" \
         $custom_args \
+        $podman_extra_args \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
         -v /home/$name/.Xauthority:/home/$name/.Xauthority \
-        -v $mount_onto:$docker_work_directory \
+        -v $mount_onto:$work_directory \
         -e DISPLAY=:1.0 \
         -e XAUTHORITY=/home/$name/.Xauthority \
         -e DOCKER_USER_NAME=$(id -un) \
