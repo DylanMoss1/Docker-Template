@@ -1,0 +1,12 @@
+alias r="unalias rm && source ranger && alias rm='echo Use '\bin\rm''"
+alias c="clear"
+alias e="exit"
+alias v="code ."
+
+alias al="nano ~/.bashrc"
+alias so="source ~/.bashrc"
+
+alias rmt="trash"
+alias rm="echo Use '/bin/rm'"
+
+alias python="python3"
