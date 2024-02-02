@@ -17,8 +17,8 @@ ARG terminal_name
 ARG user_id
 ARG group_id
 
-# SSH key location on the host's machine 
-ARG private_ssh_key_location
+# Host's private SSH key
+ARG private_ssh_key
 
 # --- END get execution arguments ---
 
@@ -57,8 +57,12 @@ RUN echo "Defaults:$name      !authenticate" >> /etc/sudoers
 RUN echo "$name ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
 # Add private ssh key from host to container 
-COPY "${private_ssh_key_location}" "/home/$name/.ssh/id_rsa"
+RUN mkdir /home/$name/.ssh
+RUN echo "$private_ssh_key" >> "/home/$name/.ssh/id_rsa"
+RUN chmod 700 "/home/$name/.ssh/"
 RUN chmod 600 "/home/$name/.ssh/id_rsa"
+RUN chown -R dylan:dylan "/home/$name/.ssh/"
+RUN ssh-keyscan -H github.com >> "/home/$name/.ssh/known_hosts"
 
 # --- END add user 
 
