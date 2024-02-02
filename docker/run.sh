@@ -3,12 +3,16 @@
 # Import config from container_config
 source ./config/container_config
 
-# If using podman: add extra id and mounting rules (to account for not being a privilaged user)
-if [ "$container_manager" = "podman" ]; then
-    podman_extra_args="--userns=keep-id \
-                       -v /dev/:/dev:rslave --mount type=devpts,destination=/dev/pts"
+# Different username and group options for Docker and podman 
+# Extra mounting options for podman (to account for not being a privilaged user)
+if [ "$container_manager" = "docker" ]; then
+    container_specific_groups_and_mounting="-e DOCKER_USER_NAME=$(id -un) \
+                                            -e DOCKER_USER_ID=$(id -u) \
+                                            -e DOCKER_USER_GROUP_NAME=$(id -gn) \
+                                            -e DOCKER_USER_GROUP_ID=$(id -g) "    
 else
-    podman_extra_args=""
+    container_specific_groups_and_mounting="--userns=keep-id \
+                                            -v /dev/:/dev:rslave --mount type=devpts,destination=/dev/pts"
 fi
 
 # If container already running, execute into it - else spin up new container
@@ -25,15 +29,12 @@ else
         --user "$(id -u):$(id -g)" \
         $custom_args \
         $podman_extra_args \
+        $container_specific_groups_and_mounting \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
         -v /home/$name/.Xauthority:/home/$name/.Xauthority \
         -v $mount_onto:$work_directory \
         -e DISPLAY=:1.0 \
         -e XAUTHORITY=/home/$name/.Xauthority \
-        -e DOCKER_USER_NAME=$(id -un) \
-        -e DOCKER_USER_ID=$(id -u) \
-        -e DOCKER_USER_GROUP_NAME=$(id -gn) \
-        -e DOCKER_USER_GROUP_ID=$(id -g) \
         -w "/home/$name" \
         "$container_name"
 fi
