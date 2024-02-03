@@ -27,6 +27,7 @@ else
         --net=host \
         --ipc=host \
         --device=/dev/dri:/dev/dri \
+        --user "$(id -u):$(id -g)" \
         $custom_args \
         $container_specific_user_config \
         $container_specific_mouting \
