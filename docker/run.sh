@@ -6,13 +6,14 @@ source ./config/container_config
 # Different username and group options for Docker and podman 
 # Extra mounting options for podman (to account for not being a privilaged user)
 if [ "$container_manager" = "docker" ]; then
-    container_specific_groups_and_mounting="-e DOCKER_USER_NAME=$(id -un) \
-                                            -e DOCKER_USER_ID=$(id -u) \
-                                            -e DOCKER_USER_GROUP_NAME=$(id -gn) \
-                                            -e DOCKER_USER_GROUP_ID=$(id -g) "    
+    container_specific_user_config="-e DOCKER_USER_NAME=$(id -un) \
+                                    -e DOCKER_USER_ID=$(id -u) \
+                                    -e DOCKER_USER_GROUP_NAME=$(id -gn) \
+                                    -e DOCKER_USER_GROUP_ID=$(id -g)"
+    container_specific_mouting=""
 else
-    container_specific_groups_and_mounting="--userns=keep-id \
-                                            -v /dev/:/dev:rslave --mount type=devpts,destination=/dev/pts"
+    container_specific_user_config="--userns=keep-id"
+    container_specific_mouting="-v /dev/:/dev:rslave --mount type=devpts,destination=/dev/pts"
 fi
 
 # If container already running, execute into it - else spin up new container
@@ -26,10 +27,9 @@ else
         --net=host \
         --ipc=host \
         --device=/dev/dri:/dev/dri \
-        --user "$(id -u):$(id -g)" \
         $custom_args \
-        $podman_extra_args \
-        $container_specific_groups_and_mounting \
+        $container_specific_user_config \
+        $container_specific_mouting \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
         -v /home/$name/.Xauthority:/home/$name/.Xauthority \
         -v $mount_onto:$work_directory \

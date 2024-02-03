@@ -112,12 +112,9 @@ RUN . /home/$name/.bashrc
 # --- END local changes ---
 
 
-# --- BEGIN switch to user ---
+# --- BEGIN add custom terminal text ---
 
 # Create and colour custom terminal text (🐳 name@terminal-name:~/)
 RUN echo "export PS1='🐳 \e[1;32m$name@$terminal_name\e[1;0m:\e[1;34m\w\e[1;0m$ '" >> /home/$name/.bashrc
 
-# Log into container user (from root)
-USER $name
-
-# --- END switch to user ---
+# --- END add custom terminal text ---
