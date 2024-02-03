@@ -16,7 +16,7 @@ password="$password"
 host_name="dylan"
 
 # Set to either "docker" or "podman" (if unsure, use "docker")
-container_manager="podman"
+container_manager="docker"
 
 # Name of the container (set to any meaningful project name)
 container_name="container_name"
