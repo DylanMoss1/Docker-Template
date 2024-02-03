@@ -1,1 +1,11 @@
 .env
+
+# SSH keys
+id_rsa.pub
+id_rsa
+id_dsa.pub
+id_dsa
+container_id_rsa
+container_id_rsa.pub
+*.pem
+*.key

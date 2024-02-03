@@ -17,9 +17,6 @@ ARG terminal_name
 ARG user_id
 ARG group_id
 
-# Host's private SSH key
-ARG private_ssh_key
-
 # --- END get execution arguments ---
 
 
@@ -58,9 +55,11 @@ RUN echo "$name ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
 # Add private ssh key from host to container 
 RUN mkdir /home/$name/.ssh
-RUN echo "$private_ssh_key" >> "/home/$name/.ssh/id_rsa"
+COPY ./config/private_details/container_id_rsa /home/$name/.ssh/id_rsa
+COPY ./config/private_details/container_id_rsa.pub /home/$name/.ssh/id_rsa.pub
 RUN chmod 700 "/home/$name/.ssh/"
 RUN chmod 600 "/home/$name/.ssh/id_rsa"
+RUN chmod 644 "/home/$name/.ssh/id_rsa.pub"
 RUN chown -R dylan:dylan "/home/$name/.ssh/"
 RUN ssh-keyscan -H github.com >> "/home/$name/.ssh/known_hosts"
 
