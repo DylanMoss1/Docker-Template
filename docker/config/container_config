@@ -18,7 +18,7 @@ password="$password"
 # Host name (corresponding to file system folder Users/host_name for Windows, or /home/host_name for Linux or MacOS)
 host_name="dylan"
 
-# Set to either "docker" or "podman" ("podman" is recommended as it has safer permissions when mounting onto the host file system)
+# Set to either "docker" or "podman" ("podman" is recommended as it has safer permissions when mounting onto the host's file system)
 container_manager="podman"
 
 # Name of the container (set to any meaningful project name)
