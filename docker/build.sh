@@ -53,10 +53,6 @@ $container_manager build -t $container_name \
 
 if [ "$custom_keys_provided" = "false" ]; then
   echo -e "\n[WARNING]: Custom SSH keys not provided. Defaulting to the host SSH keys.\n"
-  if [ -f ./config/private_details/container_id_rsa ]; then
-    rm "./config/private_details/container_id_rsa.pub"
-    rm "./config/private_details/container_id_rsa"
-  else
-    echo -e "\n[ERROR]: No SSH keys found on host machine.\n"
-  fi
+  rm "./config/private_details/container_id_rsa.pub"
+  rm "./config/private_details/container_id_rsa"
 fi
