@@ -16,25 +16,31 @@ fi
 if [ "$custom_keys_provided" = "false" ]; then
     # Check if using Windows
     if [ "$(uname -o 2>/dev/null)" = "Cygwin" ]; then
-        cp "/c/Users/$host_name/.ssh/id_rsa" "./config/private_details/container_id_rsa"
-        cp "/c/Users/$host_name/.ssh/id_rsa.pub" "./config/private_details/container_id_rsa.pub"
+        cp "/c/Users/$host_name/.ssh/id_rsa" "./config/private_details/container_id_rsa" 2> /dev/null
+        cp "/c/Users/$host_name/.ssh/id_rsa.pub" "./config/private_details/container_id_rsa.pub" 2> /dev/null
     # Check if using WSL
     elif grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
         # Check if there is a WSL-specific key 
-        if [ -f /mnt/c/Users/$host_name/.ssh/id_rsa ]; then
-            cp "/mnt/c/Users/$host_name/.ssh/id_rsa" "./config/private_details/container_id_rsa"
-            cp "/mnt/c/Users/$host_name/.ssh/id_rsa.pub" "./config/private_details/container_id_rsa.pub"
+        if [ -f /home/$host_name/.ssh/id_rsa ]; then
+            cp "/home/$host_name/.ssh/id_rsa" "./config/private_details/container_id_rsa" 2> /dev/null
+            cp "/home/$host_name/.ssh/id_rsa.pub" "./config/private_details/container_id_rsa.pub" 2> /dev/null
         # Otherwise default to the Windows key 
         else
-            cp "/c/Users/$host_name/.ssh/id_rsa" "./config/private_details/container_id_rsa"
-            cp "/c/Users/$host_name/.ssh/id_rsa.pub" "./config/private_details/container_id_rsa.pub"
+            cp "/mnt/c/Users/$host_name/.ssh/id_rsa" "./config/private_details/container_id_rsa" 2> /dev/null
+            cp "/mnt/c/Users/$host_name/.ssh/id_rsa.pub" "./config/private_details/container_id_rsa.pub" 2> /dev/null
         fi
     # Otherwise, assume we are using Linux/MacOS
     else
         # Assume host machine is Linux or MacOS
-        cp "/home/$host_name/.ssh/id_rsa" "./config/private_details/container_id_rsa"
-        cp "/home/$host_name/.ssh/id_rsa.pub" "./config/private_details/container_id_rsa.pub"
+        cp "/home/$host_name/.ssh/id_rsa" "./config/private_details/container_id_rsa" 2> /dev/null
+        cp "/home/$host_name/.ssh/id_rsa.pub" "./config/private_details/container_id_rsa.pub" 2> /dev/null
     fi
+fi
+
+# If no SSH keys found on the host machine
+if [ ! -f ./config/private_details/container_id_rsa ]; then
+  echo -e "\n[ERROR]: No SSH keys found on host machine.\n"
+  exit 1
 fi
 
 # Run container manager (either Docker or podman) with config args 
@@ -47,6 +53,10 @@ $container_manager build -t $container_name \
 
 if [ "$custom_keys_provided" = "false" ]; then
   echo -e "\n[WARNING]: Custom SSH keys not provided. Defaulting to the host SSH keys.\n"
-  rm "./config/private_details/container_id_rsa.pub"
-  rm "./config/private_details/container_id_rsa"
+  if [ -f ./config/private_details/container_id_rsa ]; then
+    rm "./config/private_details/container_id_rsa.pub"
+    rm "./config/private_details/container_id_rsa"
+  else
+    echo -e "\n[ERROR]: No SSH keys found on host machine.\n"
+  fi
 fi
