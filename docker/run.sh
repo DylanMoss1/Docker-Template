@@ -3,6 +3,9 @@
 # Import config from container_config
 source ./config/container_config
 
+# If Xauthority doesn't exist, create an empty one (for running containers on WSL)
+touch -a ~/.Xauthority
+
 # Different username and group options for Docker and podman 
 # Extra mounting options for podman (to account for not being a privilaged user)
 if [ "$container_manager" = "docker" ]; then
