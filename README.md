@@ -56,17 +56,21 @@ alias e="exit"
 
 ### Build and run project 
 
+First move into the docker directory:
+
+`cd ./docker`
+
 Build image from Dockerfile: 
 
-`./docker/build.sh`
+`./build.sh`
 
 Spawn container from image, and log into container:
 
-`./docker/run.sh`
+`./run.sh`
 
 Log into existing container: 
 
-`./docker/run.sh` (from a new terminal). 
+`./run.sh` (from a new terminal). 
 
 ## Notes 
 
