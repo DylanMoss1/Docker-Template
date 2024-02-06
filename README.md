@@ -28,13 +28,13 @@ Fill out general container setup details in:
 
 Make sure to read the IMPORTANT notice. 
 
-### Customise Dockerfile 
+### (Optional) Customise Dockerfile 
 
 Replace `FROM ubuntu:22.04` with your preferred base image. 
 
 Replace `INSERT LOCAL CONTAINER CHANGES HERE` block with any "local" Dockerfile commands specific to your project. 
 
-### Customise container environment 
+### (Optional) Customise container environment 
 
 Add Python dependencies to `./docker/config/dependencies/python_requirements.txt`. Leave blank if there are no dependencies. 
 
