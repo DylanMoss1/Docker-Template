@@ -1,7 +1,8 @@
 #!/bin/bash 
 
 # Import config from container_config
-source ./config/container_config
+source ./config/container_setup.config
+source ./config/private_details/private.config 
 
 # If SSH keys are not provided in ./private_details, retrieve SSH keys from the host machine 
 

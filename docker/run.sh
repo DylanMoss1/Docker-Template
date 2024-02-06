@@ -1,12 +1,22 @@
 #!/bin/bash
 
 # Import config from container_config
-source ./config/container_config
+source ./config/container_setup.config
 
-# If Xauthority doesn't exist, create an empty one (for running containers on WSL)
-touch -a ~/.Xauthority
+if [ "$mount_from" = "" ]; then
+    # Path to _host_ folder to mount file from
+    mount_from=$(dirname "$(pwd)")
+fi
 
-# Different username and group options for Docker and podman 
+# Path to _container_ folder to mount files onto
+work_directory=/home/$name/"$(basename "$mount_from")"
+
+# If not using Windows and .Xauthority doesn't exist, create an empty one (for running containers on WSL)
+if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null && [ ! -f "~/.Xauthority" ]; then
+    touch -a ~/.Xauthority
+fi
+
+# Different username and group options for Docker and podman
 # Extra mounting options for podman (to account for not being a privilaged user)
 if [ "$container_manager" = "docker" ]; then
     container_specific_user_config="-e DOCKER_USER_NAME=$(id -un) \
@@ -36,7 +46,7 @@ else
         $container_specific_mouting \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
         -v /home/$name/.Xauthority:/home/$name/.Xauthority \
-        -v $mount_onto:$work_directory \
+        -v $mount_from:$work_directory \
         -e DISPLAY=:1.0 \
         -e XAUTHORITY=/home/$name/.Xauthority \
         -w "/home/$name" \

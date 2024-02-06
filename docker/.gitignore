@@ -1,4 +1,4 @@
-.env
+private.config
 
 # SSH keys
 id_rsa.pub
