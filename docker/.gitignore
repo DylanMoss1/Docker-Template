@@ -1,5 +1,3 @@
-private.config
-
 # SSH keys
 id_rsa.pub
 id_rsa
