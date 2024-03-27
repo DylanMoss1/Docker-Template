@@ -28,31 +28,37 @@ Fill out general container setup details in:
 
 Make sure to read the IMPORTANT notice. 
 
-### Customise Dockerfile 
+### Customise your container 
 
-Replace `FROM ubuntu:22.04` with your preferred base image. 
+Customise the Dockerfile (`./docker/Dockerfile`)
 
-Replace `INSERT LOCAL CONTAINER CHANGES HERE` block with any "local" Dockerfile commands specific to your project. 
+- Replace `FROM ubuntu:22.04` with your preferred base image. 
 
-### Customise container environment 
+- Replace `INSERT LOCAL CONTAINER CHANGES HERE` block with any "local" Dockerfile commands specific to your project. 
 
-Add Python dependencies to `./docker/config/dependencies/python_requirements.txt`. Leave blank if there are no dependencies. 
+Add Python dependencies (`./docker/config/dependencies/python_requirements.txt`)
 
-These take the form `<python_package>` for the most up-to-date package, or `<python_package>==<version>` for a pinned package version. Multiple dependencies are separated by newlines. For example: 
+- Leave blank if there are no Python dependencies 
 
-```
-tensorflow==2.3.1
-uvicorn==0.12.2
-```
+- Add dependencies in the form `<python_package>` or `<python_package>==<version>`, as with a standard Python requirements.txt file. For example: 
 
-Add `~/.bashrc` aliases to `./docker/config/aliases/global_aliases.txt` or `./docker/config/aliases/local_alisaes.txt`. These are split into separate files to differentiate between "local" aliases specific to this project, or "global" aliases you want to reuse across multiple projects. 
+  ```
+  tensorflow==2.3.1
+  uvicorn==0.12.2
+  ```
 
-These should take the form `alias <alias_name>=<alias_command>`. Multiple aliases are separated by newlines. For example: 
+Add bashrc aliases (`./docker/config/aliases/global_aliases.txt` or `./docker/config/aliases/local_alisaes.txt`)
 
-```
-alias c="clear"
-alias e="exit"
-```
+- Local and global aliases are separated purely for personal management reasons
+
+- "local" aliases are specific to this project, and "global" aliases are those you wish to reuse across multiple projects. 
+
+- Add aliases in the form `alias <alias_name>=<alias_command>` to either file (the effect is identical). For example: 
+
+  ```
+  alias c="clear"
+  alias e="exit"
+  ```
 
 ### Build and run project 
 
@@ -70,4 +76,4 @@ Log into existing container:
 
 ## Notes 
 
-This repo has been primarily tested using podman on Ubuntu and WSL. Use Docker and other operating systems at your own risk.
+This repo has been primarily tested using podman on Ubuntu and WSL. Use Docker and other OSes at your own risk.

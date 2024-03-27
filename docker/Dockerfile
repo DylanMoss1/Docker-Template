@@ -1,23 +1,26 @@
 # syntax=docker/dockerfile:1
 
 # Install base 
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS base 
 
 
-# --- BEGIN get execution arguments ---
+# --- BEGIN get build arguments ---
 
-# Username and password within the container 
+# Container username and password
 ARG name
 ARG password
 
-# Name of the terminal, purely cosmetic (i.e. terminal looks like name@terminal-name:/)
+# Name of the terminal: terminal looks like name@terminal-name:/ 
 ARG terminal_name
 
-# Id and group of host user
+# Id and group of *host* user
 ARG user_id
 ARG group_id
 
-# --- END get execution arguments ---
+# Whether SSH keys should be added from the host machine 
+ARG add_SSH_keys
+
+# --- END get build arguments ---
 
 
 # --- BEGIN install packages ---
@@ -35,7 +38,7 @@ RUN apt-get -y install wget gpg apt-transport-https
 RUN apt-get -y install sudo vim nano ranger git 
 RUN apt-get -y install x11-xserver-utils trash-cli
 
-# Install Python libraries (add dependencies in ./config/dependencies/python_requirements.txt)
+# Install Python packages from ./config/dependencies/python_requirements.txt
 
 COPY ./config/dependencies/python_requirements.txt /python_requirements.txt
 RUN python3 -m pip install -r /python_requirements.txt
@@ -53,15 +56,23 @@ RUN echo "$name:$password" | chpasswd
 RUN echo "Defaults:$name      !authenticate" >> /etc/sudoers
 RUN echo "$name ALL=(ALL:ALL) ALL" >> /etc/sudoers
 
-# Add private ssh key from host to container 
-RUN mkdir /home/$name/.ssh
-COPY ./config/private_details/container_id_rsa /home/$name/.ssh/id_rsa
-COPY ./config/private_details/container_id_rsa.pub /home/$name/.ssh/id_rsa.pub
-RUN chmod 700 "/home/$name/.ssh/"
-RUN chmod 600 "/home/$name/.ssh/id_rsa"
-RUN chmod 644 "/home/$name/.ssh/id_rsa.pub"
-RUN chown -R dylan:dylan "/home/$name/.ssh/"
-RUN ssh-keyscan -H github.com >> "/home/$name/.ssh/known_hosts"
+# Add private ssh key from host to container if "add_SSH_keys" is true 
+
+# The [a] and [b] are hacks to not add the files if they don't exist (without crashing the build process)
+COPY ./config/private_details/container_id_rs[a] /home/$name/.ssh/id_rsa 
+COPY ./config/private_details/container_id_rsa.pu[b] /home/$name/.ssh/id_rsa.pub
+RUN if [ "$add_SSH_keys" = "true" ]; then \
+        chmod 700 "/home/$name/.ssh/"; \
+        chmod 600 "/home/$name/.ssh/id_rsa"; \
+        chmod 644 "/home/$name/.ssh/id_rsa.pub"; \
+        chown -R dylan:dylan "/home/$name/.ssh/"; \
+        ssh-keyscan -H github.com >> "/home/$name/.ssh/known_hosts"; \
+    else \
+        rm -f "/home/$name/.ssh/id_rsa"; \
+        rm -f "/home/$name/.ssh/id_rsa.pub"; \
+    fi
+
+# FROM base-SSH-
 
 # --- END add user 
 
@@ -78,9 +89,8 @@ RUN git config --global user.email "${github_email}"
 # --- BEGIN add aliases --- 
 
 # Edit aliases in ./config/aliases
-
-# Global aliases are those used across all your containerised projects
-# Local aliases are those useful to just this specific project
+#   Global aliases: used across all your containerised projects
+#   Local aliases: used in just this project
 # Seperates out re-usable aliases for future projects
 
 # Add alias files to the container
@@ -93,9 +103,6 @@ RUN echo "$(cat /local_aliases.txt)" >> /home/$name/.bashrc
 
 # Remove the alias files 
 RUN rm /global_aliases.txt /local_aliases.txt
-
-# Source ~/.bashrc 
-RUN . /home/$name/.bashrc
 
 # --- END add aliases --- 
 
